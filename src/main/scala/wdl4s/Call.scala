@@ -101,7 +101,7 @@ case class Call(alias: Option[String],
     i <- declarations if !inputMappings.contains(i.unqualifiedName) && i.expression.isEmpty
   } yield WorkflowInput(i.fullyQualifiedName, i.wdlType, i.postfixQuantifier)
 
-  override def toString: String = s"[Call name=$unqualifiedName, task=$task]"
+  override def toString: String = s"[Call $fullyQualifiedName]"
 
   /**
    * Instantiate the abstract command line corresponding to this call using the specified inputs.

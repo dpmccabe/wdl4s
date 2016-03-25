@@ -7,6 +7,9 @@ import wdl4s.expression.NoFunctions
 import wdl4s.types.{WdlArrayType, WdlStringType}
 import wdl4s.values.{WdlCallOutputsObject, WdlArray, WdlValue, WdlString}
 
+import better.files._
+import java.io.{File => JFile}
+
 class VariableResolutionSpec extends FlatSpec with Matchers with WdlTest {
   val namespace = WdlNamespaceWithWorkflow.load(
     """String global = "global"
@@ -52,7 +55,6 @@ class VariableResolutionSpec extends FlatSpec with Matchers with WdlTest {
       |
       |  call taskA as D {input: i=C.o[0]}
       |}
-      |
     """.stripMargin)
 
   val taskA = getTask("taskA")
@@ -88,7 +90,21 @@ class VariableResolutionSpec extends FlatSpec with Matchers with WdlTest {
 
   val declScatterK = scatter0.declarations.find(_.unqualifiedName == "k").get
 
-  it should "have 2 tasks" in {
+  it should "foobar" in {
+    val testCases = File("src/test/cases")
+    testCases.createDirectories()
+    val testCaseDirs = testCases.list.toSeq
+    testCaseDirs
+
+    // FQN / FQN with scopes
+    // upstream / downstream
+    // parent / child
+    // scatters
+    // ifs
+    println(testCases.path)
+  }
+
+  /*it should "have 2 tasks" in {
     namespace.tasks shouldEqual Seq(taskA, taskB)
   }
 
@@ -156,7 +172,7 @@ class VariableResolutionSpec extends FlatSpec with Matchers with WdlTest {
     it should s"instantiate a command for ${node.fullyQualifiedName}" in {
       node.instantiateCommandLine(inputs, NoFunctions, shards=Map(scatter0 -> 1))
     }
-  }
+  }*/
 
   /*val dependencyTable = Table(
     ("node", "upstream", "downstream"),

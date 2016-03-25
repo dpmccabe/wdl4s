@@ -117,6 +117,8 @@ case class Workflow(unqualifiedName: String,
 
     filtered map { case PotentialReportableSymbol(fqn, value, wildcardAllowed) => ReportableSymbol(fqn, value) }
   }
+
+  override def toString = s"[Workflow $fullyQualifiedName]"
 }
 
 case class ReportableSymbol(fullyQualifiedName: FullyQualifiedName, wdlType: WdlType)

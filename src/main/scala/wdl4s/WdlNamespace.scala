@@ -33,7 +33,7 @@ sealed trait WdlNamespace extends WdlValue with Scope {
   override def appearsInFqn: Boolean = importedAs.isDefined
   override def namespace: WdlNamespace = this
   def resolve(fqn: FullyQualifiedName): Option[Scope] = {
-    descendants.find(d => d.fullyQualifiedName == fqn || d.fullyQualifiedNameWithIndexScopes == fqn)
+    (descendants + this).find(d => d.fullyQualifiedName == fqn || d.fullyQualifiedNameWithIndexScopes == fqn)
   }
 }
 
