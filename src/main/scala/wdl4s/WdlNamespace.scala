@@ -495,6 +495,8 @@ object WdlNamespace {
 object WdlNamespaceWithWorkflow {
   def load(wdlSource: WdlSource): WdlNamespaceWithWorkflow = from(WdlNamespace.load(wdlSource))
 
+  def load(wdlFile: File, importResolver: ImportResolver): WdlNamespaceWithWorkflow = from(WdlNamespace.load(wdlFile, importResolver))
+
   def load(wdlSource: WdlSource, importResolver: ImportResolver): WdlNamespaceWithWorkflow = {
     WdlNamespaceWithWorkflow.from(WdlNamespace.load(wdlSource, importResolver))
   }

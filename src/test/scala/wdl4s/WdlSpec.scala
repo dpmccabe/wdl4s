@@ -13,7 +13,7 @@ class WdlSpec extends FlatSpec with Matchers {
     val wdlFile = testDir / "test.wdl"
     if (!wdlFile.exists) fail(s"Expecting a WDL file at ${testDir.name}")
     def resolver(relPath: String): String = (testDir / relPath).contentAsString
-    val namespace = WdlNamespaceWithWorkflow.load(wdlFile.contentAsString, resolver)
+    val namespace = WdlNamespaceWithWorkflow.load(wdlFile.toJava, resolver _)
     val wdlFileRelPath = File(".").relativize(wdlFile)
 
     expectedFullyQualifiedNames(testDir, namespace) foreach { case (fqn, expectedType) =>

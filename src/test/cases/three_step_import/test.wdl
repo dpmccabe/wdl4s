@@ -1,6 +1,6 @@
-import "ps.wdl"
-import "wc.wdl"
-import "cgrep.wdl"
+import "../ps.wdl"
+import "../wc.wdl"
+import "../cgrep.wdl"
 
 workflow three_step {
   call ps
