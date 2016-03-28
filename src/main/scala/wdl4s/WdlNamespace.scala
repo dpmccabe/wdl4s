@@ -22,6 +22,7 @@ import scala.util.{Failure, Success, Try}
 sealed trait WdlNamespace extends WdlValue with Scope {
   final val wdlType = WdlNamespaceType
   def ast: Ast
+  def resource = ast.findFirstTerminal.map(_.getResource).getOrElse("NONE")
   def importedAs: Option[String] // Used when imported with `as`
   def imports: Seq[Import]
   def namespaces: Seq[WdlNamespace]

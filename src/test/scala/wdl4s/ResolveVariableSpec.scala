@@ -5,10 +5,10 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 
 class ResolveVariableSpec extends WdlTest {
-  val ns = loadWdlFile(File("src/test/cases/if_statement/test.wdl"))
-  val callD = getCall(ns, "D")
-  val callE = getCall(ns, "E")
-  val scatter0 = getScatter(ns, 0)
+  val ifStatementNs = loadWdlFile(File("src/test/cases/if_statement/test.wdl"))
+  val callD = getCall(ifStatementNs, "D")
+  val callE = getCall(ifStatementNs, "E")
+  val scatter0 = getScatter(ifStatementNs, 0)
 
   val lookupVarTable = Table(
     ("node", "variable", "resolution"),
@@ -26,7 +26,7 @@ class ResolveVariableSpec extends WdlTest {
 
   forAll(lookupVarTable) { (node, variable, resolution) =>
     it should s"resolve variable $variable (relative to $node) -> ${resolution.getOrElse("None")}" in {
-      ns.resolve(node).flatMap(_.resolveVariable(variable)) shouldEqual resolution.flatMap(ns.resolve)
+      ifStatementNs.resolve(node).flatMap(_.resolveVariable(variable)) shouldEqual resolution.flatMap(ifStatementNs.resolve)
     }
   }
 }
