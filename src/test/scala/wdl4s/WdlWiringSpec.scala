@@ -1,17 +1,17 @@
 package wdl4s
 
-import scala.collection.immutable.ListMap
-import org.scalatest.{FlatSpec, Matchers}
 import better.files._
 import spray.json._
 
-class WdlSpec extends FlatSpec with Matchers {
+import scala.collection.immutable.ListMap
+
+class WdlWiringSpec extends WdlTest {
   val testCases = File("src/test/cases")
   testCases.createDirectories()
 
   testCases.list.toSeq.filter(_.isDirectory) foreach { testDir =>
     val wdlFile = testDir / "test.wdl"
-    if (!wdlFile.exists) fail(s"Expecting a WDL file at ${testDir.name}")
+    if (!wdlFile.exists) fail(s"Expecting a 'test.wdl' file at ${testDir.name}")
     def resolver(relPath: String): String = (testDir / relPath).contentAsString
     val namespace = WdlNamespaceWithWorkflow.load(wdlFile.toJava, resolver _)
     val wdlFileRelPath = File(".").relativize(wdlFile)
@@ -21,6 +21,14 @@ class WdlSpec extends FlatSpec with Matchers {
         val resolution = namespace.resolve(fqn)
         resolution.map(_.getClass.getSimpleName) shouldEqual Option(expectedType)
         resolution.map(_.fullyQualifiedName) shouldEqual Option(fqn)
+      }
+    }
+
+    expectedInputs(testDir, namespace) foreach { case (fqn, wdlType) =>
+      it should s"have $fqn (of type $wdlType) as an input in WDL file $wdlFileRelPath" in {
+        val input = namespace.workflow.inputs.get(fqn)
+        input should not be None
+        input.map(_.wdlType.toWdlString) shouldEqual Option(wdlType)
       }
     }
 
@@ -63,6 +71,22 @@ class WdlSpec extends FlatSpec with Matchers {
       it should s"compute ancestry for FQN ${node.fullyQualifiedName} in WDL file $wdlFileRelPath" in {
         node.ancestry shouldEqual expectedAncestry
       }
+    }
+  }
+
+  private def expectedInputs(testDir: File, namespace: WdlNamespaceWithWorkflow): Map[FullyQualifiedName, String] = {
+    val expectedWorkflowInputsFile = testDir / "inputs.json"
+
+    if (!expectedWorkflowInputsFile.exists) {
+      val workflowInputs = namespace.workflow.inputs map { case (fqn, input) =>
+        fqn -> JsString(input.wdlType.toWdlString)
+      }
+      val jsObject = JsObject(ListMap(workflowInputs.toSeq.sortBy(_._1): _*))
+      expectedWorkflowInputsFile.write(jsObject.prettyPrint)
+    }
+
+    expectedWorkflowInputsFile.contentAsString.parseJson.asInstanceOf[JsObject].fields.asInstanceOf[Map[String, JsString]] map {
+      case (k, v) => k -> v.value
     }
   }
 
